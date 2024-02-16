@@ -72,21 +72,7 @@ const login = async (req, res, next) => {
   });
 };
 
-const getall = async (req, res) => {
-  db.all("SELECT * FROM users", (err, data) => {
-    if (err) {
-      next(new Error(err.message));
-    } else {
-      res.status(StatusCodes.OK).json({
-        success: true,
-        data,
-      });
-    }
-  });
-};
-
 module.exports = {
   register,
-  getall,
   login,
 };

@@ -5,6 +5,7 @@ const { sampleBooks } = require("./constants/books");
 
 const sqlite3 = require("sqlite3").verbose();
 const { serveSwagger, setupSwagger } = require("./config/swagger");
+const bcrypt = require("bcryptjs");
 const helmet = require("helmet");
 const cors = require("cors");
 const xss = require("xss-clean");
@@ -74,6 +75,31 @@ db.get(
           }
         );
       });
+    }
+  }
+);
+db.get(
+  `
+  SELECT COUNT(*) as count FROM users
+`,
+  async (err, row) => {
+    if (err) {
+      throw new Error(err.message);
+    }
+    const salt = await bcrypt.genSalt(10);
+    if (row.count === 0) {
+      db.run(
+        `
+            INSERT INTO users (email, password)
+            VALUES (?, ?)
+          `,
+        ["random@gmail.com", await bcrypt.hash("random123", salt)],
+        (err) => {
+          if (err) {
+            console.error(err.message);
+          }
+        }
+      );
     }
   }
 );
